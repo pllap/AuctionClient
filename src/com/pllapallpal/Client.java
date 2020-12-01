@@ -10,6 +10,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Client {
 
@@ -17,9 +18,9 @@ public class Client {
     private final int PORT;
     private SocketChannel socketChannel = null;
     private Selector selector = null;
-    private CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+    private final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
 
-    public Client(String address, int port) {
+    private Client(String address, int port) {
         this.ADDRESS = address;
         this.PORT = port;
 
@@ -30,12 +31,18 @@ public class Client {
             try {
                 while (true) {
                     selector.select();
-                    Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
-                    while (iterator.hasNext()) {
-                        SelectionKey selectionKey = iterator.next();
+                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                    Iterator<SelectionKey> keys = selectedKeys.iterator();
+                    while (keys.hasNext()) {
+                        SelectionKey selectionKey = keys.next();
                         if (selectionKey.isReadable()) {
-                            read(selectionKey);
+                            ByteBuffer byteBuffer = readFrom((SocketChannel) selectionKey.channel());
+                            // 받은 데이터 확인 (DEBUG)
+                            String data = decoder.decode(byteBuffer).toString();
+                            System.out.println("Received: " + data);
+                            byteBuffer.clear();
                         }
+                        keys.remove();
                     }
                 }
             } catch (IOException e) {
@@ -43,20 +50,30 @@ public class Client {
             }
         }).start();
 
-        // writer
-        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-        try {
-            while (true) {
-                Scanner sc = new Scanner(System.in);
-                String message = sc.nextLine();
-                byteBuffer.clear();
-                byteBuffer.put(message.getBytes());
-                byteBuffer.flip();
-                socketChannel.write(byteBuffer);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        // writer
+//        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+//        new Thread(() -> {
+//            try {
+//                while (true) {
+//                    Scanner sc = new Scanner(System.in);
+//                    String message = sc.nextLine();
+//                    byteBuffer.clear();
+//                    byteBuffer.put(message.getBytes());
+//                    byteBuffer.flip();
+//                    socketChannel.write(byteBuffer);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
+    }
+
+    private static class ClientHolder {
+        private static final Client instance = new Client("localhost", 7777);
+    }
+
+    public static Client getInstance() {
+        return ClientHolder.instance;
     }
 
     private void initClient() {
@@ -70,20 +87,30 @@ public class Client {
         }
     }
 
-    private void read(SelectionKey selectionKey) {
-        SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
+    private ByteBuffer readFrom(SocketChannel socketChannel) {
         ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
         try {
-            byteBuffer.flip();
-            String data = decoder.decode(byteBuffer).toString();
-            System.out.println("Received: " + data);
-            byteBuffer.clear();
+            socketChannel.read(byteBuffer);
         } catch (IOException e) {
             try {
                 socketChannel.close();
             } catch (IOException ex) {
                 e.printStackTrace();
             }
+        }
+
+        byteBuffer.flip();
+        return byteBuffer;
+    }
+
+    public void send(String data) {
+        try {
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            buffer.put(data.getBytes());
+            buffer.flip();
+            socketChannel.write(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
