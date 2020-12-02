@@ -5,6 +5,7 @@ import com.pllapallpal.Data;
 
 import javax.swing.*;
 import java.awt.*;
+import java.nio.ByteBuffer;
 
 public class LoginFrame {
 
@@ -40,10 +41,14 @@ public class LoginFrame {
         JLabel label = new JLabel("Enter username: ");
         JTextField textField = new JTextField();
         JButton button = new JButton("Login");
+        textField.addActionListener(e -> {
+            initUsername(textField);
+            mainFrame.updateUsername();
+            mainFrame.setVisible(true);
+            this.setVisible(false);
+        });
         button.addActionListener(e -> {
-            String username = textField.getText();
-            Data.getInstance().setNickname(username);
-            Client.getInstance().send("LOGIN " + username);
+            initUsername(textField);
             mainFrame.updateUsername();
             mainFrame.setVisible(true);
             this.setVisible(false);
@@ -54,6 +59,16 @@ public class LoginFrame {
 
         mainPanel.add(titlePanel, BorderLayout.CENTER);
         mainPanel.add(inputPanel, BorderLayout.SOUTH);
+    }
+
+    private void initUsername(JTextField textField) {
+        String username = textField.getText();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+        byteBuffer.putInt(100);
+        byteBuffer.put(username.getBytes());
+        byteBuffer.flip();
+        Client.getInstance().send(byteBuffer);
+        Data.getInstance().setNickname(username);
     }
 
     public JFrame getFrame() {

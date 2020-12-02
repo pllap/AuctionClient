@@ -9,6 +9,8 @@ public class MainFrame {
 
     private final JFrame frame;
     private JPanel mainPanel;
+    private AuctionPanel auctionPanel;
+    private LobbyPanel lobbyPanel;
 
     public MainFrame() {
         frame = new JFrame();
@@ -19,11 +21,15 @@ public class MainFrame {
         LoginFrame loginFrame = new LoginFrame(this);
         loginFrame.setVisible(true);
         initializeComponents();
+
+        auctionPanel = new AuctionPanel();
+        lobbyPanel = new LobbyPanel();
     }
 
     private void initializeComponents() {
         mainPanel = (JPanel) frame.getContentPane();
         mainPanel.add(new JLabel(Data.getInstance().getNickname()), BorderLayout.CENTER);
+        mainPanel.setBackground(Color.PINK.brighter());
     }
 
     public JFrame getFrame() {
@@ -31,7 +37,9 @@ public class MainFrame {
     }
 
     public void updateUsername() {
-        mainPanel.add(new JLabel(Data.getInstance().getNickname()), BorderLayout.CENTER);
+        JLabel temp = new JLabel(Data.getInstance().getNickname());
+        temp.setFont(new Font("Segoe", Font.PLAIN, 100));
+        mainPanel.add(temp, BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();
     }
