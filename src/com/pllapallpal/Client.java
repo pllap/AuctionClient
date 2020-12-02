@@ -9,7 +9,6 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
-import java.util.Scanner;
 import java.util.Set;
 
 public class Client {
@@ -37,10 +36,26 @@ public class Client {
                         SelectionKey selectionKey = keys.next();
                         if (selectionKey.isReadable()) {
                             ByteBuffer byteBuffer = readFrom((SocketChannel) selectionKey.channel());
-                            // 받은 데이터 확인 (DEBUG)
-                            String data = decoder.decode(byteBuffer).toString();
-                            System.out.println("Received: " + data);
-                            byteBuffer.clear();
+                            int protocol = byteBuffer.getInt();
+                            switch (protocol) {
+                                // LOGIN
+                                case 100: {
+                                    break;
+                                }
+                                // LOGOUT
+                                case 101: {
+                                    break;
+                                }
+                                // LIST
+                                case 102: {
+                                    int numData = byteBuffer.getInt();
+                                    String receivedList = decoder.decode(byteBuffer).toString();
+                                    System.out.println("Received: " + receivedList);
+                                    byteBuffer.clear();
+                                    break;
+                                }
+
+                            }
                         }
                         keys.remove();
                     }
@@ -49,23 +64,6 @@ public class Client {
                 e.printStackTrace();
             }
         }).start();
-
-//        // writer
-//        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-//        new Thread(() -> {
-//            try {
-//                while (true) {
-//                    Scanner sc = new Scanner(System.in);
-//                    String message = sc.nextLine();
-//                    byteBuffer.clear();
-//                    byteBuffer.put(message.getBytes());
-//                    byteBuffer.flip();
-//                    socketChannel.write(byteBuffer);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }).start();
     }
 
     private static class ClientHolder {
@@ -103,12 +101,9 @@ public class Client {
         return byteBuffer;
     }
 
-    public void send(String data) {
+    public void send(ByteBuffer byteBuffer) {
         try {
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-            buffer.put(data.getBytes());
-            buffer.flip();
-            socketChannel.write(buffer);
+            socketChannel.write(byteBuffer);
         } catch (IOException e) {
             e.printStackTrace();
         }

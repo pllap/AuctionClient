@@ -1,11 +1,10 @@
 package com.pllapallpal;
 
+import com.pllapallpal.view.MainFrame;
+
 public class Main {
 
     public static void main(String[] args) {
-
-        new Client("localhost", 7777);
-
-        //new MainFrame();
+        new MainFrame();
     }
 }
