@@ -6,10 +6,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.Set;
 
 public class Client {
 
@@ -17,7 +13,6 @@ public class Client {
     private final int PORT;
     private SocketChannel socketChannel = null;
     private Selector selector = null;
-    private final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
 
     private Client(String address, int port) {
         this.ADDRESS = address;
@@ -26,44 +21,7 @@ public class Client {
         initClient();
 
         // reader
-        new Thread(() -> {
-            try {
-                while (true) {
-                    selector.select();
-                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                    Iterator<SelectionKey> keys = selectedKeys.iterator();
-                    while (keys.hasNext()) {
-                        SelectionKey selectionKey = keys.next();
-                        if (selectionKey.isReadable()) {
-                            ByteBuffer byteBuffer = readFrom((SocketChannel) selectionKey.channel());
-                            int protocol = byteBuffer.getInt();
-                            switch (protocol) {
-                                // LOGIN
-                                case 100: {
-                                    break;
-                                }
-                                // LOGOUT
-                                case 101: {
-                                    break;
-                                }
-                                // LIST
-                                case 102: {
-                                    int numData = byteBuffer.getInt();
-                                    String receivedList = decoder.decode(byteBuffer).toString();
-                                    System.out.println("Received: " + receivedList);
-                                    byteBuffer.clear();
-                                    break;
-                                }
-
-                            }
-                        }
-                        keys.remove();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
+        new Thread(new SelectorThread(selector)).start();
     }
 
     private static class ClientHolder {
@@ -83,22 +41,6 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private ByteBuffer readFrom(SocketChannel socketChannel) {
-        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-        try {
-            socketChannel.read(byteBuffer);
-        } catch (IOException e) {
-            try {
-                socketChannel.close();
-            } catch (IOException ex) {
-                e.printStackTrace();
-            }
-        }
-
-        byteBuffer.flip();
-        return byteBuffer;
     }
 
     public void send(ByteBuffer byteBuffer) {
