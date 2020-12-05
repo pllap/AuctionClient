@@ -2,6 +2,7 @@ package com.pllapallpal.view;
 
 import com.pllapallpal.Client;
 import com.pllapallpal.Data;
+import com.pllapallpal.Protocol;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,7 +63,7 @@ public class LoginFrame {
     private void initUsername(JTextField textField) {
         String username = textField.getText();
         ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-        byteBuffer.putInt(100);
+        byteBuffer.putInt(Protocol.LOGIN);
         byteBuffer.put(username.getBytes());
         byteBuffer.flip();
         Client.getInstance().send(byteBuffer);

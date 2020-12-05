@@ -38,19 +38,19 @@ public class SelectorThread implements Runnable {
                         int protocol = byteBuffer.getInt();
                         switch (protocol) {
                             // LOGIN
-                            case 100: {
+                            case Protocol.LOGIN: {
                                 break;
                             }
                             // LOGOUT
-                            case 101: {
+                            case Protocol.LOGOUT: {
                                 return;
                             }
                             // LIST_AUCTION
-                            case 102: {
+                            case Protocol.LIST_AUCTION: {
                                 break;
                             }
                             // LIST_User
-                            case 103: {
+                            case Protocol.LIST_USER: {
                                 int numData = byteBuffer.getInt();
                                 List<String> receivedList = Arrays.asList(decoder.decode(byteBuffer).toString().split(">>>"));
                                 byteBuffer.clear();
