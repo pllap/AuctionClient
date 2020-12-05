@@ -9,8 +9,8 @@ public class MainFrame {
 
     private final JFrame frame;
     private JPanel mainPanel;
-    private AuctionPanel auctionPanel;
     private LobbyPanel lobbyPanel;
+    private AuctionPanel auctionPanel;
 
     public MainFrame() {
         frame = new JFrame();
@@ -28,10 +28,10 @@ public class MainFrame {
         mainPanel.add(new JLabel(Data.getInstance().getNickname()), BorderLayout.CENTER);
         mainPanel.setBackground(Color.PINK.brighter());
 
-        auctionPanel = new AuctionPanel();
         lobbyPanel = new LobbyPanel();
+        auctionPanel = new AuctionPanel();
 
-        mainPanel.add(auctionPanel.getPanel(), BorderLayout.CENTER);
+        mainPanel.add(lobbyPanel.getPanel(), BorderLayout.CENTER);
     }
 
     public JFrame getFrame() {
