@@ -45,8 +45,12 @@ public class SelectorThread implements Runnable {
                             case 101: {
                                 return;
                             }
-                            // LIST
+                            // LIST_AUCTION
                             case 102: {
+                                break;
+                            }
+                            // LIST_User
+                            case 103: {
                                 int numData = byteBuffer.getInt();
                                 List<String> receivedList = Arrays.asList(decoder.decode(byteBuffer).toString().split(">>>"));
                                 byteBuffer.clear();
