@@ -9,6 +9,7 @@ public class LobbyPanel {
 
     public LobbyPanel() {
         this.panel = new JPanel(new BorderLayout());
+        this.panel.setBackground(Color.RED);
 
         initializeComponents();
     }

@@ -43,13 +43,11 @@ public class LoginFrame {
         JButton button = new JButton("Login");
         textField.addActionListener(e -> {
             initUsername(textField);
-            mainFrame.updateUsername();
             mainFrame.setVisible(true);
             this.setVisible(false);
         });
         button.addActionListener(e -> {
             initUsername(textField);
-            mainFrame.updateUsername();
             mainFrame.setVisible(true);
             this.setVisible(false);
         });
