@@ -11,11 +11,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class SelectorThread implements Runnable {
 
     private final Selector selector;
     private final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+
+    private static Consumer<List<String>> onReceiveList;
 
     public SelectorThread(Selector selector) {
         this.selector = selector;
@@ -46,14 +49,10 @@ public class SelectorThread implements Runnable {
                             case 102: {
                                 int numData = byteBuffer.getInt();
                                 List<String> receivedList = Arrays.asList(decoder.decode(byteBuffer).toString().split(">>>"));
-                                System.out.println("Received user list:");
-                                for (String data : receivedList) {
-                                    System.out.println(data);
-                                }
                                 byteBuffer.clear();
+                                onReceiveList.accept(receivedList);
                                 break;
                             }
-
                         }
                     }
                     keys.remove();
@@ -62,6 +61,10 @@ public class SelectorThread implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void addOnReceiveList(Consumer<List<String>> onReceiveList) {
+        SelectorThread.onReceiveList = onReceiveList;
     }
 
     private ByteBuffer readFrom(SocketChannel socketChannel) {
