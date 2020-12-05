@@ -9,15 +9,17 @@ import java.util.List;
 public class LobbyPanel {
 
     private JPanel panel;
+    private JPanel auctionListPanel;
     private JPanel itemPanel;
-
-    private JList<String> list;
+    private JList<String> userJList;
 
     public LobbyPanel() {
-        panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.GREEN);
+        panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBackground(Color.PINK.brighter());
 
-        itemPanel = new JPanel(new BorderLayout());
+        itemPanel = new JPanel();
+        itemPanel.setLayout(new BorderLayout());
         JLabel itemImage = new JLabel();
         ImageIcon imageIcon = new ImageIcon("itemImage.png");
         itemImage.setIcon(imageIcon);
@@ -28,9 +30,21 @@ public class LobbyPanel {
         itemPanel.add(itemInfoScrollPane, BorderLayout.CENTER);
         panel.add(itemPanel, BorderLayout.WEST);
 
-        list = new JList<>();
+        auctionListPanel = new JPanel();
+        auctionListPanel.setLayout(new BoxLayout(auctionListPanel, BoxLayout.Y_AXIS));
+        Dimension auctionListPanelPreferredSize = auctionListPanel.getPreferredSize();
+        auctionListPanelPreferredSize.width = 600;
+        auctionListPanel.setPreferredSize(auctionListPanelPreferredSize);
+        panel.add(auctionListPanel, BorderLayout.CENTER);
+
+        userJList = new JList<>();
+        Dimension userJListPreferredSize = userJList.getPreferredSize();
+        userJListPreferredSize.width = 200;
+        userJList.setPreferredSize(userJListPreferredSize);
+        userJList.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+        panel.add(userJList, BorderLayout.EAST);
+
         SelectorThread.addOnReceiveList(this::updateUserList);
-        panel.add(list, BorderLayout.EAST);
     }
 
     public JPanel getPanel() {
@@ -38,7 +52,7 @@ public class LobbyPanel {
     }
 
     private void updateUserList(List<String> userList) {
-        list.setListData(userList.toArray(new String[0]));
+        userJList.setListData(userList.toArray(new String[0]));
         panel.revalidate();
         panel.repaint();
     }
