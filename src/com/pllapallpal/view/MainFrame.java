@@ -28,8 +28,8 @@ public class MainFrame {
         mainPanel.add(new JLabel(Data.getInstance().getNickname()), BorderLayout.CENTER);
         mainPanel.setBackground(Color.PINK.brighter());
 
-        lobbyPanel = new LobbyPanel();
-        auctionPanel = new AuctionPanel();
+        lobbyPanel = new LobbyPanel(this);
+        auctionPanel = new AuctionPanel(this);
 
         mainPanel.add(lobbyPanel.getPanel(), BorderLayout.CENTER);
     }

@@ -6,8 +6,12 @@ import java.awt.*;
 public class AuctionPanel {
 
     private JPanel panel;
+    private MainFrame mainFrame;
 
-    public AuctionPanel() {
+    public AuctionPanel(MainFrame mainFrame) {
+
+        this.mainFrame = mainFrame;
+
         this.panel = new JPanel(new BorderLayout());
         this.panel.setBackground(Color.RED);
 
