@@ -7,10 +7,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class SelectorThread implements Runnable {
@@ -34,27 +31,33 @@ public class SelectorThread implements Runnable {
                 while (keys.hasNext()) {
                     SelectionKey selectionKey = keys.next();
                     if (selectionKey.isReadable()) {
-                        ByteBuffer byteBuffer = readFrom((SocketChannel) selectionKey.channel());
+                        ByteBuffer byteBuffer = read(selectionKey);
+                        // DEBUG
+                        System.out.println(byteBuffer.toString());
+                        System.out.println(Arrays.toString(byteBuffer.array()));
                         int protocol = byteBuffer.getInt();
                         switch (protocol) {
-                            // LOGIN
                             case Protocol.LOGIN: {
                                 break;
                             }
-                            // LOGOUT
                             case Protocol.LOGOUT: {
                                 return;
                             }
-                            // LIST_AUCTION
                             case Protocol.LIST_AUCTION: {
+                                System.out.println("제발");
                                 break;
                             }
-                            // LIST_User
                             case Protocol.LIST_USER: {
+                                List<String> userList = new ArrayList<>();
                                 int numData = byteBuffer.getInt();
-                                List<String> receivedList = Arrays.asList(decoder.decode(byteBuffer).toString().split(">>>"));
+                                for (int i = 0; i < numData; ++i) {
+                                    int usernameBytesLength = byteBuffer.getInt();
+                                    byte[] usernameBytes = new byte[usernameBytesLength];
+                                    byteBuffer.get(usernameBytes, byteBuffer.arrayOffset(), usernameBytesLength);
+                                    userList.add(decoder.decode(ByteBuffer.wrap(usernameBytes)).toString());
+                                }
                                 byteBuffer.clear();
-                                onReceiveList.accept(receivedList);
+                                onReceiveList.accept(userList);
                                 break;
                             }
                         }
@@ -71,19 +74,25 @@ public class SelectorThread implements Runnable {
         SelectorThread.onReceiveList = onReceiveList;
     }
 
-    private ByteBuffer readFrom(SocketChannel socketChannel) {
-        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-        try {
-            socketChannel.read(byteBuffer);
-        } catch (IOException e) {
-            try {
-                socketChannel.close();
-            } catch (IOException ex) {
-                e.printStackTrace();
+    private ByteBuffer read(SelectionKey selectionKey) throws IOException {
+
+        SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
+
+        ByteBuffer capacityBuffer = ByteBuffer.allocate(Integer.BYTES);
+        socketChannel.read(capacityBuffer);
+        capacityBuffer.flip();
+        int capacity = capacityBuffer.getInt();
+
+        ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
+        while (byteBuffer.hasRemaining()) {
+            synchronized (socketChannel) {
+                if (socketChannel.isConnected()) {
+                    socketChannel.read(byteBuffer);
+                }
             }
         }
-
         byteBuffer.flip();
+
         return byteBuffer;
     }
 }

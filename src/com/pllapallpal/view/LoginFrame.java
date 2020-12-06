@@ -43,12 +43,16 @@ public class LoginFrame {
         JTextField textField = new JTextField();
         JButton button = new JButton("Login");
         textField.addActionListener(e -> {
-            initUsername(textField);
+            String username = textField.getText();
+            login(username);
+            setUsername(username);
             mainFrame.setVisible(true);
             this.setVisible(false);
         });
         button.addActionListener(e -> {
-            initUsername(textField);
+            String username = textField.getText();
+            login(username);
+            setUsername(username);
             mainFrame.setVisible(true);
             this.setVisible(false);
         });
@@ -60,13 +64,21 @@ public class LoginFrame {
         mainPanel.add(inputPanel, BorderLayout.SOUTH);
     }
 
-    private void initUsername(JTextField textField) {
-        String username = textField.getText();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+    private void login(String username) {
+        ByteBuffer capacityBuffer = ByteBuffer.allocate(Integer.BYTES);
+        int bufferSize = Integer.BYTES + username.getBytes().length;
+        capacityBuffer.putInt(bufferSize);
+        capacityBuffer.flip();
+        Client.getInstance().send(capacityBuffer);
+
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bufferSize);
         byteBuffer.putInt(Protocol.LOGIN);
         byteBuffer.put(username.getBytes());
         byteBuffer.flip();
         Client.getInstance().send(byteBuffer);
+    }
+
+    private void setUsername(String username) {
         Data.getInstance().setNickname(username);
     }
 
