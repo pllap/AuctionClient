@@ -1,5 +1,8 @@
 package com.pllapallpal;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -15,7 +18,8 @@ public class SelectorThread implements Runnable {
     private final Selector selector;
     private final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
 
-    private static Consumer<List<String>> onReceiveList;
+    private static Consumer<List<Auction>> onReceiveAuctionList;
+    private static Consumer<List<String>> onReceiveUserList;
 
     public SelectorThread(Selector selector) {
         this.selector = selector;
@@ -44,7 +48,31 @@ public class SelectorThread implements Runnable {
                                 return;
                             }
                             case Protocol.LIST_AUCTION: {
-                                System.out.println("제발");
+                                int numData = byteBuffer.getInt();
+                                List<Auction> auctionList = new ArrayList<>();
+                                try {
+                                    for (int i = 0; i < numData; ++i) {
+                                        int imgBytes = byteBuffer.getInt();
+                                        byte[] byteImg = new byte[imgBytes];
+                                        byteBuffer.get(byteImg, byteBuffer.position(), imgBytes);
+                                        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteImg);
+                                        BufferedImage itemImage = ImageIO.read(byteArrayInputStream);
+                                        byteArrayInputStream.close();
+
+                                        int nameBytes = byteBuffer.getInt();
+                                        byte[] byteName = new byte[nameBytes];
+                                        byteBuffer.get(byteName, byteBuffer.position(), nameBytes);
+                                        String itemName = decoder.decode(ByteBuffer.wrap(byteName)).toString();
+                                        Auction item = new Auction();
+                                        item.setItemImage(itemImage);
+                                        item.setItemName(itemName);
+
+                                        auctionList.add(item);
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                onReceiveAuctionList.accept(auctionList);
                                 break;
                             }
                             case Protocol.LIST_USER: {
@@ -57,7 +85,7 @@ public class SelectorThread implements Runnable {
                                     userList.add(decoder.decode(ByteBuffer.wrap(usernameBytes)).toString());
                                 }
                                 byteBuffer.clear();
-                                onReceiveList.accept(userList);
+                                onReceiveUserList.accept(userList);
                                 break;
                             }
                         }
@@ -70,8 +98,12 @@ public class SelectorThread implements Runnable {
         }
     }
 
-    public static void addOnReceiveList(Consumer<List<String>> onReceiveList) {
-        SelectorThread.onReceiveList = onReceiveList;
+    public static void addOnReceiveAuctionList(Consumer<List<Auction>> onReceiveAuctionList) {
+        SelectorThread.onReceiveAuctionList = onReceiveAuctionList;
+    }
+
+    public static void addOnReceiveUserList(Consumer<List<String>> onReceiveUserList) {
+        SelectorThread.onReceiveUserList = onReceiveUserList;
     }
 
     private ByteBuffer read(SelectionKey selectionKey) throws IOException {

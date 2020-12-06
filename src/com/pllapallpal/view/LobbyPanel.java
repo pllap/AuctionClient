@@ -1,5 +1,6 @@
 package com.pllapallpal.view;
 
+import com.pllapallpal.Auction;
 import com.pllapallpal.SelectorThread;
 
 import javax.swing.*;
@@ -44,11 +45,34 @@ public class LobbyPanel {
         userJList.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
         panel.add(userJList, BorderLayout.EAST);
 
-        SelectorThread.addOnReceiveList(this::updateUserList);
+        SelectorThread.addOnReceiveAuctionList(this::updateAuctionList);
+        SelectorThread.addOnReceiveUserList(this::updateUserList);
     }
 
     public JPanel getPanel() {
         return panel;
+    }
+
+    private void updateAuctionList(List<Auction> auctionList) {
+        auctionListPanel.removeAll();
+        for (Auction auction : auctionList) {
+            JPanel auctionPanel = new JPanel();
+            auctionPanel.setLayout(new BorderLayout());
+
+            JLabel itemImage = new JLabel();
+            itemImage.setIcon(new ImageIcon(auction.getItemImage()));
+            auctionPanel.add(itemImage, BorderLayout.WEST);
+
+            JPanel linearPanel = new JPanel();
+            linearPanel.add(new JLabel(auction.getItemName()));
+            linearPanel.add(new JButton("참가"));
+            auctionPanel.add(linearPanel, BorderLayout.CENTER);
+
+            auctionListPanel.add(auctionPanel);
+        }
+        auctionListPanel.add(new JButton("추가"));
+        auctionListPanel.revalidate();
+        auctionListPanel.repaint();
     }
 
     private void updateUserList(List<String> userList) {
