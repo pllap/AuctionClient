@@ -81,10 +81,10 @@ public class LobbyPanel {
         itemInfoPanel.setLayout(new BoxLayout(itemInfoPanel, BoxLayout.PAGE_AXIS));
         itemInfoPanel.setBackground(Color.WHITE);
         itemInfoPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JLabel itemName = new JLabel("Item Name: " + item.getItemName());
+        JLabel itemName = new JLabel("Item name: " + item.getItemName());
         itemName.setFont(new Font("Segoe", Font.PLAIN, 20));
         itemInfoPanel.add(itemName);
-        JLabel itemPrice = new JLabel(Integer.toString(item.getStartingPrice()));
+        JLabel itemPrice = new JLabel("Starting price: " + Integer.toString(item.getStartingPrice()));
         System.out.println(item.getStartingPrice());
         itemPrice.setFont(new Font("Segoe", Font.PLAIN, 20));
         itemInfoPanel.add(itemPrice);

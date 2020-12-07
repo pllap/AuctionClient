@@ -83,7 +83,7 @@ public class NewAuctionFrame {
         productNameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, productNameField.getPreferredSize().height));
         mainPanel.add(productNameField);
 
-        JLabel startingPriceLabel = new JLabel("Starting Price");
+        JLabel startingPriceLabel = new JLabel("Starting Price (Won)");
         startingPriceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(startingPriceLabel);
         JTextField startingPriceField = new JTextField();

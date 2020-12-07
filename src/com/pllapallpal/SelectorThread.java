@@ -53,6 +53,11 @@ public class SelectorThread implements Runnable {
                                 try {
                                     for (int i = 0; i < numData; ++i) {
 
+                                        int keyBytes = byteBuffer.getInt();
+                                        byte[] byteKey = new byte[keyBytes];
+                                        byteBuffer.get(byteKey, byteBuffer.arrayOffset(), keyBytes);
+                                        String key = new String(byteKey, StandardCharsets.UTF_8);
+
                                         int creatorNameBytes = byteBuffer.getInt();
                                         byte[] byteCreatorName = new byte[creatorNameBytes];
                                         byteBuffer.get(byteCreatorName, byteBuffer.arrayOffset(), creatorNameBytes);
@@ -72,7 +77,7 @@ public class SelectorThread implements Runnable {
 
                                         int startingPrice = byteBuffer.getInt();
 
-                                        Auction item = new Auction();
+                                        Auction item = new Auction(key);
                                         item.setCreatorName(creatorName);
                                         item.setItemImage(itemImage);
                                         item.setItemName(itemName);

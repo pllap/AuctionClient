@@ -4,13 +4,14 @@ import java.awt.image.BufferedImage;
 
 public class Auction {
 
+    private String key;
     private String creatorName;
     private BufferedImage itemImage;
     private String itemName;
     private int startingPrice;
 
-    public Auction() {
-
+    public Auction(String key) {
+        this.key = key;
     }
 
     public String getCreatorName() {
@@ -43,5 +44,9 @@ public class Auction {
 
     public void setStartingPrice(int startingPrice) {
         this.startingPrice = startingPrice;
+    }
+
+    public String getKey() {
+        return key;
     }
 }
