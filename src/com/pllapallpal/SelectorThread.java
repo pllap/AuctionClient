@@ -52,21 +52,31 @@ public class SelectorThread implements Runnable {
                                 List<Auction> auctionList = new ArrayList<>();
                                 try {
                                     for (int i = 0; i < numData; ++i) {
+
+                                        int creatorNameBytes = byteBuffer.getInt();
+                                        byte[] byteCreatorName = new byte[creatorNameBytes];
+                                        byteBuffer.get(byteCreatorName, byteBuffer.arrayOffset(), creatorNameBytes);
+                                        String creatorName = decoder.decode(ByteBuffer.wrap(byteCreatorName)).toString();
+
                                         int imgBytes = byteBuffer.getInt();
                                         byte[] byteImg = new byte[imgBytes];
-                                        byteBuffer.get(byteImg, byteBuffer.position(), imgBytes);
+                                        byteBuffer.get(byteImg, byteBuffer.arrayOffset(), imgBytes);
                                         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteImg);
                                         BufferedImage itemImage = ImageIO.read(byteArrayInputStream);
                                         byteArrayInputStream.close();
 
-                                        int nameBytes = byteBuffer.getInt();
-                                        byte[] byteName = new byte[nameBytes];
-                                        byteBuffer.get(byteName, byteBuffer.position(), nameBytes);
+                                        int itemNameBytes = byteBuffer.getInt();
+                                        byte[] byteName = new byte[itemNameBytes];
+                                        byteBuffer.get(byteName, byteBuffer.arrayOffset(), itemNameBytes);
                                         String itemName = decoder.decode(ByteBuffer.wrap(byteName)).toString();
+
+                                        int startingPrice = byteBuffer.getInt();
+
                                         Auction item = new Auction();
+                                        item.setCreatorName(creatorName);
                                         item.setItemImage(itemImage);
                                         item.setItemName(itemName);
-
+                                        item.setStartingPrice(startingPrice);
                                         auctionList.add(item);
                                     }
                                 } catch (IOException e) {

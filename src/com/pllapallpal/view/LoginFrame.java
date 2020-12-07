@@ -44,6 +44,9 @@ public class LoginFrame {
         JButton button = new JButton("Login");
         textField.addActionListener(e -> {
             String username = textField.getText();
+            if (username.length() < 1) {
+                return;
+            }
             login(username);
             setUsername(username);
             mainFrame.setVisible(true);
@@ -51,6 +54,9 @@ public class LoginFrame {
         });
         button.addActionListener(e -> {
             String username = textField.getText();
+            if (username.length() < 1) {
+                return;
+            }
             login(username);
             setUsername(username);
             mainFrame.setVisible(true);

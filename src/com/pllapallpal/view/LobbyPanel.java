@@ -25,14 +25,14 @@ public class LobbyPanel {
         panel.setBackground(Color.PINK.brighter());
 
         auctionListPanel = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(auctionListPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(10, 0));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(8);
         auctionListPanel.setLayout(new BoxLayout(auctionListPanel, BoxLayout.Y_AXIS));
         auctionListPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
-        auctionListPanel.setBackground(Color.CYAN);
+        auctionListPanel.setBackground(Color.PINK.brighter());
         auctionListPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        Dimension auctionListPanelPreferredSize = auctionListPanel.getPreferredSize();
-        auctionListPanelPreferredSize.width = 600;
-        auctionListPanel.setPreferredSize(auctionListPanelPreferredSize);
-        panel.add(auctionListPanel, BorderLayout.CENTER);
+        panel.add(scrollPane, BorderLayout.CENTER);
 
         userJList = new JList<>();
         Dimension userJListPreferredSize = userJList.getPreferredSize();
@@ -71,15 +71,31 @@ public class LobbyPanel {
     private JPanel makeAuctionItemPanel(Auction item) {
         JPanel auctionItemPanel = new JPanel();
         auctionItemPanel.setLayout(new BorderLayout());
+        auctionItemPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        JLabel itemImage = new JLabel();
-        itemImage.setIcon(new ImageIcon(item.getItemImage()));
-        auctionItemPanel.add(itemImage, BorderLayout.WEST);
+        JLabel itemImageLabel = new JLabel();
+        itemImageLabel.setIcon(new ImageIcon(item.getItemImage().getScaledInstance(128, 128, Image.SCALE_DEFAULT)));
+        auctionItemPanel.add(itemImageLabel, BorderLayout.WEST);
 
-        JPanel linearPanel = new JPanel();
-        linearPanel.add(new JLabel(item.getItemName()));
-        linearPanel.add(new JButton("참가"));
-        auctionItemPanel.add(linearPanel, BorderLayout.CENTER);
+        JPanel itemInfoPanel = new JPanel();
+        itemInfoPanel.setLayout(new BoxLayout(itemInfoPanel, BoxLayout.PAGE_AXIS));
+        itemInfoPanel.setBackground(Color.WHITE);
+        itemInfoPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JLabel itemName = new JLabel("Item Name: " + item.getItemName());
+        itemName.setFont(new Font("Segoe", Font.PLAIN, 20));
+        itemInfoPanel.add(itemName);
+        JLabel itemPrice = new JLabel(Integer.toString(item.getStartingPrice()));
+        System.out.println(item.getStartingPrice());
+        itemPrice.setFont(new Font("Segoe", Font.PLAIN, 20));
+        itemInfoPanel.add(itemPrice);
+        itemInfoPanel.add(Box.createVerticalGlue());
+        JButton button = new JButton("참가");
+        button.setFont(new Font("Segoe", Font.PLAIN, 20));
+        itemInfoPanel.add(button);
+        auctionItemPanel.add(itemInfoPanel, BorderLayout.CENTER);
+
+        auctionItemPanel.setMaximumSize(new Dimension(600, 200));
+        auctionItemPanel.validate();
         return auctionItemPanel;
     }
 
