@@ -1,10 +1,13 @@
 package com.pllapallpal.view;
 
 import com.pllapallpal.Auction;
+import com.pllapallpal.Client;
+import com.pllapallpal.Protocol;
 import com.pllapallpal.SelectorThread;
 
 import javax.swing.*;
 import java.awt.*;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public class LobbyPanel {
@@ -91,6 +94,22 @@ public class LobbyPanel {
         itemInfoPanel.add(Box.createVerticalGlue());
         JButton button = new JButton("참가");
         button.setFont(new Font("Segoe", Font.PLAIN, 20));
+        button.addActionListener(e -> {
+            System.out.println(item.getKey());
+            int capacity = Integer.BYTES + // protocol
+                    Integer.BYTES + item.getKey().getBytes().length; // auction key length, auction key
+            ByteBuffer capacityBuffer = ByteBuffer.allocate(Integer.BYTES);
+            capacityBuffer.putInt(capacity);
+            capacityBuffer.flip();
+
+            ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
+            byteBuffer.putInt(Protocol.AUCTION_ENTER); // protocol
+            byteBuffer.putInt(item.getKey().getBytes().length); // auction key length
+            byteBuffer.put(item.getKey().getBytes()); // auction key
+            byteBuffer.flip();
+            Client.getInstance().send(capacityBuffer);
+            Client.getInstance().send(byteBuffer);
+        });
         itemInfoPanel.add(button);
         auctionItemPanel.add(itemInfoPanel, BorderLayout.CENTER);
 

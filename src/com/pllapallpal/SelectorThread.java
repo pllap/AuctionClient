@@ -38,7 +38,6 @@ public class SelectorThread implements Runnable {
                         ByteBuffer byteBuffer = read(selectionKey);
                         // DEBUG
                         System.out.println(byteBuffer.toString());
-                        System.out.println(Arrays.toString(byteBuffer.array()));
                         int protocol = byteBuffer.getInt();
                         switch (protocol) {
                             case Protocol.LOGIN: {
