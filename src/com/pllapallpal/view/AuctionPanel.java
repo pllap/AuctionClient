@@ -50,6 +50,23 @@ public class AuctionPanel {
         backButton.setFont(new Font("Segoe", Font.PLAIN, 17));
         backButton.setPreferredSize(new Dimension(150, backButton.getPreferredSize().height));
         backButton.addActionListener(e -> {
+            String auctionKey = auction.getKey();
+            byte[] byteAuctionKey = auctionKey.getBytes();
+            int capacity = Integer.BYTES + // protocol
+                    Integer.BYTES + byteAuctionKey.length; // key bytes + key
+            ByteBuffer capacityBuffer = ByteBuffer.allocate(Integer.BYTES);
+            capacityBuffer.putInt(capacity);
+            capacityBuffer.flip();
+
+            ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
+            byteBuffer.putInt(Protocol.AUCTION_QUIT);
+            byteBuffer.putInt(byteAuctionKey.length);
+            byteBuffer.put(byteAuctionKey);
+            byteBuffer.flip();
+
+            Client.getInstance().send(capacityBuffer);
+            Client.getInstance().send(byteBuffer);
+
             auction.exit();
             mainFrame.backToAuctionList();
         });
