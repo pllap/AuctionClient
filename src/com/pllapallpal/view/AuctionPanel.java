@@ -151,7 +151,7 @@ public class AuctionPanel {
     }
 
     void onMessageReceived(String message) {
-        chatTextArea.setText(chatTextArea.getText() + "\n" + message);
+        chatTextArea.setText(chatTextArea.getText() + message + "\n");
     }
 
     public JPanel getPanel() {
