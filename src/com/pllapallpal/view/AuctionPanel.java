@@ -1,17 +1,22 @@
 package com.pllapallpal.view;
 
 import com.pllapallpal.Auction;
+import com.pllapallpal.Client;
+import com.pllapallpal.Protocol;
+import com.pllapallpal.SelectorThread;
 
 import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.nio.ByteBuffer;
 
 public class AuctionPanel {
 
     private JPanel panel;
     private MainFrame mainFrame;
+    JTextArea chatTextArea;
 
     private Auction auction;
 
@@ -21,6 +26,7 @@ public class AuctionPanel {
 
     public void setAuction(Auction auction) {
         this.auction = auction;
+        SelectorThread.addOnMessageReceived(this::onMessageReceived);
 
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -80,22 +86,55 @@ public class AuctionPanel {
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
         doc.setParagraphAttributes(0, doc.getLength(), center, false);
-        leftTimePane.setText("Left Time\nLine Feed");
+        leftTimePane.setText("Left Time\n00:30");
         leftTimePane.setFont(new Font("Segoe", Font.PLAIN, 20));
         leftTimePane.setForeground(Color.RED);
         leftTimePane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         eastPanel.add(leftTimePane, BorderLayout.NORTH);
-        JTextField chatTextField = new JTextField("chatTextField");
-        chatTextField.setPreferredSize(new Dimension(150, chatTextField.getPreferredSize().height));
-        eastPanel.add(chatTextField, BorderLayout.CENTER);
+
+        chatTextArea = new JTextArea();
+        chatTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        chatTextArea.setPreferredSize(new Dimension(150, chatTextArea.getPreferredSize().height));
+        eastPanel.add(chatTextArea, BorderLayout.CENTER);
         JPanel chatInputPanel = new JPanel();
         chatInputPanel.setLayout(new BorderLayout());
         JTextField chatInputField = new JTextField();
+        chatInputField.addActionListener(event -> {
+
+            String auctionKey = auction.getKey();
+            byte[] byteAuctionKey = auctionKey.getBytes();
+
+            String message = chatInputField.getText();
+            chatInputField.setText("");
+            byte[] byteMessage = message.getBytes();
+
+            int capacity = Integer.BYTES + // protocol
+                    Integer.BYTES + byteAuctionKey.length + // auction key length + auction key
+                    Integer.BYTES + byteMessage.length; // message length + message
+            ByteBuffer capacityBuffer = ByteBuffer.allocate(Integer.BYTES);
+            capacityBuffer.putInt(capacity);
+            capacityBuffer.flip();
+
+            ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
+            byteBuffer.putInt(Protocol.AUCTION_MESSAGE);
+            byteBuffer.putInt(byteAuctionKey.length);
+            byteBuffer.put(byteAuctionKey);
+            byteBuffer.putInt(byteMessage.length);
+            byteBuffer.put(byteMessage);
+            byteBuffer.flip();
+
+            Client.getInstance().send(capacityBuffer);
+            Client.getInstance().send(byteBuffer);
+        });
         chatInputPanel.add(chatInputField, BorderLayout.CENTER);
         JButton chatSendButton = new JButton("send");
         chatInputPanel.add(chatSendButton, BorderLayout.EAST);
         eastPanel.add(chatInputPanel, BorderLayout.SOUTH);
         panel.add(eastPanel, BorderLayout.EAST);
+    }
+
+    void onMessageReceived(String message) {
+        chatTextArea.setText(chatTextArea.getText() + "\n" + message);
     }
 
     public JPanel getPanel() {
