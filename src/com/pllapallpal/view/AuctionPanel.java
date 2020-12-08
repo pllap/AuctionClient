@@ -11,17 +11,21 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.nio.ByteBuffer;
+import java.util.Formatter;
 
 public class AuctionPanel {
 
-    private JPanel panel;
     private MainFrame mainFrame;
+    private JPanel panel;
+    JPanel eastPanel;
     JTextArea chatTextArea;
+    JTextPane leftTimePane;
 
     private Auction auction;
 
     public AuctionPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
+        SelectorThread.addOnUpdateLeftTime(this::updateLeftTime);
     }
 
     public void setAuction(Auction auction) {
@@ -80,6 +84,7 @@ public class AuctionPanel {
         bidLog.setEditable(false);
         bidLog.setText("Bid Log");
         centerPanel.add(bidLog, BorderLayout.CENTER);
+
         JPanel bidPanel = new JPanel();
         bidPanel.setLayout(new BorderLayout());
         bidPanel.setBackground(Color.PINK.brighter());
@@ -96,9 +101,9 @@ public class AuctionPanel {
         centerPanel.add(bidPanel, BorderLayout.SOUTH);
         panel.add(centerPanel, BorderLayout.CENTER);
 
-        JPanel eastPanel = new JPanel();
+        eastPanel = new JPanel();
         eastPanel.setLayout(new BorderLayout());
-        JTextPane leftTimePane = new JTextPane();
+        leftTimePane = new JTextPane();
         StyledDocument doc = leftTimePane.getStyledDocument();
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
@@ -156,5 +161,13 @@ public class AuctionPanel {
 
     public JPanel getPanel() {
         return panel;
+    }
+
+    public void updateLeftTime(int leftTime) {
+        Formatter formatter = new Formatter();
+        formatter.format("%02d", leftTime);
+        leftTimePane.setText("Left Time\n00:" + formatter);
+        eastPanel.revalidate();
+        eastPanel.repaint();
     }
 }
