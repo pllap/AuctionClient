@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 public class NewAuctionFrame {
 
     private final JFrame frame;
+    private JPanel mainPanel;
     private final LobbyPanel lobbyPanel;
     private BufferedImage itemImage;
     private boolean imageUploaded = false;
@@ -40,7 +41,7 @@ public class NewAuctionFrame {
 
     private void initializeComponents() {
 
-        JPanel mainPanel = (JPanel) frame.getContentPane();
+        mainPanel = (JPanel) frame.getContentPane();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 5, 20));
         mainPanel.setBackground(new Color(255, 245, 235));

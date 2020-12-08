@@ -24,6 +24,7 @@ public class SelectorThread implements Runnable {
     private static Consumer<List<Auction>> onReceiveAuctionList;
     private static Consumer<List<String>> onReceiveUserList;
     private static Consumer<Auction> onEnterAuction;
+    private static Consumer<Auction> onQuitAuction;
 
     public SelectorThread(Selector selector) {
         this.selector = selector;
@@ -125,6 +126,10 @@ public class SelectorThread implements Runnable {
                                 }
                                 break;
                             }
+                            case Protocol.AUCTION_QUIT: {
+                                onQuitAuction.accept(Data.getInstance().getCurrentAuction());
+                                break;
+                            }
                         }
                     }
                     keys.remove();
@@ -145,6 +150,10 @@ public class SelectorThread implements Runnable {
 
     public static void addOnEnterAuction(Consumer<Auction> onEnterAuction) {
         SelectorThread.onEnterAuction = onEnterAuction;
+    }
+
+    public static void addOnQuitAuction(Consumer<Auction> onQuitAuction) {
+        SelectorThread.onQuitAuction = onQuitAuction;
     }
 
     private ByteBuffer read(SelectionKey selectionKey) throws IOException {

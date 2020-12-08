@@ -38,6 +38,8 @@ public class LobbyPanel {
         panel.add(scrollPane, BorderLayout.CENTER);
 
         userJList = new JList<>();
+        userJList.setFont(new Font("Segoe", Font.PLAIN, 17));
+        userJList.setEnabled(false);
         Dimension userJListPreferredSize = userJList.getPreferredSize();
         userJListPreferredSize.width = 200;
         userJList.setPreferredSize(userJListPreferredSize);
@@ -85,14 +87,14 @@ public class LobbyPanel {
         itemInfoPanel.setBackground(Color.WHITE);
         itemInfoPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         JLabel itemName = new JLabel("Item name: " + item.getItemName());
-        itemName.setFont(new Font("Segoe", Font.PLAIN, 20));
+        itemName.setFont(new Font("Segoe", Font.PLAIN, 17));
         itemInfoPanel.add(itemName);
         JLabel itemPrice = new JLabel("Starting price: " + Integer.toString(item.getStartingPrice()));
-        itemPrice.setFont(new Font("Segoe", Font.PLAIN, 20));
+        itemPrice.setFont(new Font("Segoe", Font.PLAIN, 17));
         itemInfoPanel.add(itemPrice);
         itemInfoPanel.add(Box.createVerticalGlue());
-        JButton button = new JButton("참가");
-        button.setFont(new Font("Segoe", Font.PLAIN, 20));
+        JButton button = new JButton("Enter");
+        button.setFont(new Font("Segoe", Font.PLAIN, 17));
         button.addActionListener(e -> {
             int capacity = Integer.BYTES + // protocol
                     Integer.BYTES + item.getKey().getBytes().length; // auction key length, auction key

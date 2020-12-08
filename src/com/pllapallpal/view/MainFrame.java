@@ -1,8 +1,6 @@
 package com.pllapallpal.view;
 
-import com.pllapallpal.Auction;
-import com.pllapallpal.Data;
-import com.pllapallpal.SelectorThread;
+import com.pllapallpal.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +9,7 @@ public class MainFrame {
 
     private final JFrame frame;
     private JPanel mainPanel;
+    private LobbyPanel lobbyPanel;
     private AuctionPanel auctionPanel;
 
     public MainFrame() {
@@ -24,6 +23,7 @@ public class MainFrame {
         initializeComponents();
 
         SelectorThread.addOnEnterAuction(this::enterAuction);
+        SelectorThread.addOnQuitAuction(this::quitAuction);
     }
 
     private void initializeComponents() {
@@ -31,25 +31,36 @@ public class MainFrame {
         mainPanel.add(new JLabel(Data.getInstance().getNickname()), BorderLayout.CENTER);
         mainPanel.setBackground(Color.PINK.brighter());
 
+        lobbyPanel = new LobbyPanel(this);
         auctionPanel = new AuctionPanel(this);
 
-        mainPanel.add(new LobbyPanel(this).getPanel(), BorderLayout.CENTER);
+        mainPanel.add(lobbyPanel.getPanel(), BorderLayout.CENTER);
     }
 
     public JFrame getFrame() {
         return frame;
     }
 
-    public void updateUsername() {
-
+    public void backToAuctionList() {
+        mainPanel.removeAll();
+        mainPanel.add(lobbyPanel.getPanel(), BorderLayout.CENTER);
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 
     public void enterAuction(Auction auction) {
         auctionPanel.setAuction(auction);
+        auction.enter();
         mainPanel.removeAll();
         mainPanel.add(auctionPanel.getPanel(), BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();
+    }
+
+    public void quitAuction(Auction auction) {
+        auction.exit();
+        Data.getInstance().getAuctionList().remove(auction);
+        backToAuctionList();
     }
 
     public void setVisible(boolean b) {

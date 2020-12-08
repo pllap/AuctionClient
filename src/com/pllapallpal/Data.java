@@ -8,6 +8,7 @@ public class Data {
     private String nickname = null;
     private List<Auction> auctionList;
     private List<String> userList;
+    private Auction currentAuction;
 
     private Data() {
         userList = new ArrayList<>();
@@ -36,5 +37,13 @@ public class Data {
 
     public List<Auction> getAuctionList() {
         return auctionList;
+    }
+
+    public void setCurrentAuction(Auction currentAuction) {
+        this.currentAuction = currentAuction;
+    }
+
+    public Auction getCurrentAuction() {
+        return currentAuction;
     }
 }

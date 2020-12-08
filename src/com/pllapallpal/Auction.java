@@ -9,6 +9,7 @@ public class Auction {
     private BufferedImage itemImage;
     private String itemName;
     private int startingPrice;
+    private int entered;
 
     public Auction(String key) {
         this.key = key;
@@ -48,5 +49,13 @@ public class Auction {
 
     public String getKey() {
         return key;
+    }
+
+    public void enter() {
+        entered = 1;
+    }
+
+    public void exit() {
+        entered = 0;
     }
 }
