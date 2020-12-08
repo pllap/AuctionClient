@@ -1,6 +1,8 @@
 package com.pllapallpal.view;
 
-import com.pllapallpal.*;
+import com.pllapallpal.Auction;
+import com.pllapallpal.Data;
+import com.pllapallpal.SelectorThread;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,6 +46,7 @@ public class MainFrame {
     public void backToAuctionList() {
         mainPanel.removeAll();
         mainPanel.add(lobbyPanel.getPanel(), BorderLayout.CENTER);
+        mainPanel.invalidate();
         mainPanel.revalidate();
         mainPanel.repaint();
     }

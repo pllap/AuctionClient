@@ -1,9 +1,6 @@
 package com.pllapallpal.view;
 
-import com.pllapallpal.Auction;
-import com.pllapallpal.Client;
-import com.pllapallpal.Protocol;
-import com.pllapallpal.SelectorThread;
+import com.pllapallpal.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -109,6 +106,8 @@ public class LobbyPanel {
             byteBuffer.flip();
             Client.getInstance().send(capacityBuffer);
             Client.getInstance().send(byteBuffer);
+
+            Data.getInstance().setCurrentAuction(item);
         });
         itemInfoPanel.add(button);
         auctionItemPanel.add(itemInfoPanel, BorderLayout.CENTER);

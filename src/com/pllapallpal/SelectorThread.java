@@ -1,7 +1,6 @@
 package com.pllapallpal;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -11,7 +10,9 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -136,6 +137,7 @@ public class SelectorThread implements Runnable {
                                 break;
                             }
                             case Protocol.AUCTION_QUIT: {
+                                System.out.println(Data.getInstance().getCurrentAuction().getItemName());
                                 onQuitAuction.accept(Data.getInstance().getCurrentAuction());
                                 break;
                             }
