@@ -1,6 +1,8 @@
 package com.pllapallpal.view;
 
+import com.pllapallpal.Auction;
 import com.pllapallpal.Data;
+import com.pllapallpal.SelectorThread;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +11,6 @@ public class MainFrame {
 
     private final JFrame frame;
     private JPanel mainPanel;
-    private LobbyPanel lobbyPanel;
     private AuctionPanel auctionPanel;
 
     public MainFrame() {
@@ -21,6 +22,8 @@ public class MainFrame {
         LoginFrame loginFrame = new LoginFrame(this);
         loginFrame.setVisible(true);
         initializeComponents();
+
+        SelectorThread.addOnEnterAuction(this::enterAuction);
     }
 
     private void initializeComponents() {
@@ -28,10 +31,9 @@ public class MainFrame {
         mainPanel.add(new JLabel(Data.getInstance().getNickname()), BorderLayout.CENTER);
         mainPanel.setBackground(Color.PINK.brighter());
 
-        lobbyPanel = new LobbyPanel(this);
         auctionPanel = new AuctionPanel(this);
 
-        mainPanel.add(lobbyPanel.getPanel(), BorderLayout.CENTER);
+        mainPanel.add(new LobbyPanel(this).getPanel(), BorderLayout.CENTER);
     }
 
     public JFrame getFrame() {
@@ -40,6 +42,14 @@ public class MainFrame {
 
     public void updateUsername() {
 
+    }
+
+    public void enterAuction(Auction auction) {
+        auctionPanel.setAuction(auction);
+        mainPanel.removeAll();
+        mainPanel.add(auctionPanel.getPanel(), BorderLayout.CENTER);
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 
     public void setVisible(boolean b) {

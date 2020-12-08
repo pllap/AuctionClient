@@ -1,6 +1,7 @@
 package com.pllapallpal;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static javax.swing.JOptionPane.showMessageDialog;
+
 public class SelectorThread implements Runnable {
 
     private final Selector selector;
@@ -20,6 +23,7 @@ public class SelectorThread implements Runnable {
 
     private static Consumer<List<Auction>> onReceiveAuctionList;
     private static Consumer<List<String>> onReceiveUserList;
+    private static Consumer<Auction> onEnterAuction;
 
     public SelectorThread(Selector selector) {
         this.selector = selector;
@@ -48,7 +52,8 @@ public class SelectorThread implements Runnable {
                             }
                             case Protocol.LIST_AUCTION: {
                                 int numData = byteBuffer.getInt();
-                                List<Auction> auctionList = new ArrayList<>();
+                                List<Auction> auctionList = Data.getInstance().getAuctionList();
+                                auctionList.clear();
                                 try {
                                     for (int i = 0; i < numData; ++i) {
 
@@ -90,7 +95,8 @@ public class SelectorThread implements Runnable {
                                 break;
                             }
                             case Protocol.LIST_USER: {
-                                List<String> userList = new ArrayList<>();
+                                List<String> userList = Data.getInstance().getUserList();
+                                userList.clear();
                                 int numData = byteBuffer.getInt();
                                 for (int i = 0; i < numData; ++i) {
                                     int usernameBytesLength = byteBuffer.getInt();
@@ -100,6 +106,23 @@ public class SelectorThread implements Runnable {
                                 }
                                 byteBuffer.clear();
                                 onReceiveUserList.accept(userList);
+                                break;
+                            }
+                            case Protocol.AUCTION_ENTER: {
+                                byte isUserInAuction = byteBuffer.get();
+                                int keyBytes = byteBuffer.getInt();
+                                byte[] byteKey = new byte[keyBytes];
+                                byteBuffer.get(byteKey, byteBuffer.arrayOffset(), keyBytes);
+                                String auctionKey = new String(byteKey, StandardCharsets.UTF_8);
+                                if (isUserInAuction == Protocol.FALSE) {
+                                    showMessageDialog(null, "You are already in auction.");
+                                } else if (isUserInAuction == Protocol.TRUE) {
+                                    for (Auction auction : Data.getInstance().getAuctionList()) {
+                                        if (auctionKey.equals(auction.getKey())) {
+                                            onEnterAuction.accept(auction);
+                                        }
+                                    }
+                                }
                                 break;
                             }
                         }
@@ -118,6 +141,10 @@ public class SelectorThread implements Runnable {
 
     public static void addOnReceiveUserList(Consumer<List<String>> onReceiveUserList) {
         SelectorThread.onReceiveUserList = onReceiveUserList;
+    }
+
+    public static void addOnEnterAuction(Consumer<Auction> onEnterAuction) {
+        SelectorThread.onEnterAuction = onEnterAuction;
     }
 
     private ByteBuffer read(SelectionKey selectionKey) throws IOException {

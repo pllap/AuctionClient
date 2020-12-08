@@ -88,14 +88,12 @@ public class LobbyPanel {
         itemName.setFont(new Font("Segoe", Font.PLAIN, 20));
         itemInfoPanel.add(itemName);
         JLabel itemPrice = new JLabel("Starting price: " + Integer.toString(item.getStartingPrice()));
-        System.out.println(item.getStartingPrice());
         itemPrice.setFont(new Font("Segoe", Font.PLAIN, 20));
         itemInfoPanel.add(itemPrice);
         itemInfoPanel.add(Box.createVerticalGlue());
         JButton button = new JButton("참가");
         button.setFont(new Font("Segoe", Font.PLAIN, 20));
         button.addActionListener(e -> {
-            System.out.println(item.getKey());
             int capacity = Integer.BYTES + // protocol
                     Integer.BYTES + item.getKey().getBytes().length; // auction key length, auction key
             ByteBuffer capacityBuffer = ByteBuffer.allocate(Integer.BYTES);
